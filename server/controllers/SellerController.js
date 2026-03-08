@@ -25,13 +25,22 @@ export const sellerLogin = async (req, res) => {
       role: 'seller',
     }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.cookie("sellerToken", token, {
-      httpOnly: true,
-      secure: true,              // ✅ MUST be true in production
-      sameSite: "none",          // ✅ REQUIRED for cross-domain
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // In sellerLogin function - REPLACE the res.cookie line with:
+res.cookie("sellerToken", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+});
 
+// In sellerLogout function - REPLACE with:
+res.clearCookie("sellerToken", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+});
     return res.json({
       success: true,
       message: "Logged in successfully",

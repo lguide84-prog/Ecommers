@@ -1,17 +1,14 @@
 import express from "express";
-import authSeller from "../middlewares/authSeller.js";
+import authSeller from "../middlewares/authSeller.js"; // Make sure this is imported
 import { isSellerAuth, sellerLogin, sellerLogout } from "../controllers/SellerController.js";
 
 const sellerRouter = express.Router();
 
 // Public routes
 sellerRouter.post("/login", sellerLogin);
-sellerRouter.get("/isauth", isSellerAuth);
+sellerRouter.get("/isauth", authSeller, isSellerAuth); // Add authSeller middleware here
 
-// Logout should be POST (you're using POST, which is correct)
-sellerRouter.post("/logout", sellerLogout);  // Make sure this line exists!
-
-// Protected routes (if any)
-// sellerRouter.get("/dashboard", authSeller, someController);
+// Logout route
+sellerRouter.post("/logout", sellerLogout);
 
 export default sellerRouter;

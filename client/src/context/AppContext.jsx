@@ -4,9 +4,12 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 // Configure axios defaults
+// Configure axios defaults
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+// Add this to ensure cookies are sent with every request
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 // Add request interceptor for logging
 axios.interceptors.request.use(
   (config) => {
@@ -78,23 +81,29 @@ export const AppContextProvider = ({ children }) => {
   }, [cartItems, user]);
 
   // Check seller authentication
-  const fetchSeller = async () => {
-    setLoading(prev => ({ ...prev, seller: true }));
-    try {
-      const { data } = await axios.get("/api/seller/isauth");
-      if (data.success) {
-        setIsSeller(true);
-      } else {
-        setIsSeller(false);
-      }
-    } catch (error) {
-      console.error("Error checking seller auth:", error);
+  // Check seller authentication
+const fetchSeller = async () => {
+  setLoading(prev => ({ ...prev, seller: true }));
+  try {
+    console.log("=== CHECKING SELLER AUTH ===");
+    const { data } = await axios.get("/api/seller/isauth");
+    console.log("Seller auth response:", data);
+    
+    if (data.success) {
+      setIsSeller(true);
+      console.log("✅ Seller authenticated");
+    } else {
       setIsSeller(false);
-    } finally {
-      setLoading(prev => ({ ...prev, seller: false }));
+      console.log("❌ Seller not authenticated:", data.message);
     }
-  };
-
+  } catch (error) {
+    console.error("Error checking seller auth:", error);
+    console.log("Error response:", error.response?.data);
+    setIsSeller(false);
+  } finally {
+    setLoading(prev => ({ ...prev, seller: false }));
+  }
+};
   // Fetch user data
   const fetchUser = async () => {
     setLoading(prev => ({ ...prev, user: true }));
