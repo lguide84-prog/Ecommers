@@ -1,0 +1,66 @@
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;300;400&display=swap');
+
+@import "tailwindcss";
+
+
+*{
+  font-family: "Outfit", sans-serif;
+}
+@theme {
+  --color-primary:#4fbf8b;
+  --color-primary-dull: #44ae7c;
+  /* Add this line to define the font in the theme */
+  --font-roboto-slab: "Roboto Slab", serif;
+}
+
+* {
+  font-family: "Outfit", sans-serif;
+}
+
+/* Add a specific helper class to ensure it overrides the * selector */
+.font-roboto-slab {
+  font-family: "Roboto Slab", serif !important;
+}
+/* ખાસ modal transitions */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.modal-exit {
+  opacity: 1;
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
+}
+/* index.css में सिर्फ यह जोड़ो */
+
+.play{
+  font-family: "Playfair Display", serif;
+  font-style: normal;
+}
+
+
+.exo {
+  font-family: "Exo", sans-serif;
+
+  font-style: normal;
+}
+
+.big {
+  font-family: "Big Shoulders Stencil", sans-serif;
+
+  font-style: normal;
+}
