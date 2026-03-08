@@ -1,0 +1,114 @@
+here is my file sturucture ask me what file's you need 
+
+agro/
+│
+├── .history/
+│
+├── client/
+│   ├── node_modules/
+│   ├── public/
+│   ├── src/
+│   │
+│   │   ├── assets/
+│   │
+│   │   ├── components/
+│   │   │   ├── seller/
+│   │   │   │   ├── SellerLogin.jsx
+│   │   │   │   ├── Addaddress.jsx
+│   │   │   │   └── BestSeller.jsx
+│   │   │   │
+│   │   │   ├── BottomBanners.jsx
+│   │   │   ├── Brands.jsx
+│   │   │   ├── Categories.jsx
+│   │   │   ├── Contact.jsx
+│   │   │   ├── FloatingButtons.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Loading.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── NewsLetter.jsx
+│   │   │   ├── OurStory.jsx
+│   │   │   ├── ProductCard.jsx
+│   │   │   └── Reviews.jsx
+│   │
+│   │   ├── context/
+│   │   │   └── AppContext.jsx
+│   │
+│   │   ├── pages/
+│   │   │   ├── seller/
+│   │   │   │   ├── Addproduct.jsx
+│   │   │   │   ├── Order.jsx
+│   │   │   │   ├── ProductList.jsx
+│   │   │   │   └── SellerLayout.jsx
+│   │   │   │
+│   │   │   ├── AllProduct.jsx
+│   │   │   ├── Cart.jsx
+│   │   │   ├── FeatureCollection.jsx
+│   │   │   ├── HeroSection.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Myorder.jsx
+│   │   │   ├── Policy.jsx
+│   │   │   ├── Productcatog.jsx
+│   │   │   ├── ProductDetails.jsx
+│   │   │   ├── Return.jsx
+│   │   │   ├── Term.jsx
+│   │   │   └── WhyChooseUs.jsx
+│   │
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   │
+│   ├── .env
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   ├── vercel.json
+│   └── vite.config.js
+│
+server/
+│
+├── config/
+│   ├── cloudconfig.js
+│   ├── db.js
+│   └── multer.js
+│
+├── controllers/
+│   ├── AddressController.js
+│   ├── cartController.js
+│   ├── OrderController.js
+│   ├── ProductController.js
+│   ├── SellerController.js
+│   └── UserController.js
+│
+├── middlewares/
+│   ├── authSeller.js
+│   └── authUser.js
+│
+├── models/
+│   ├── Address.js
+│   ├── Order.js
+│   ├── Product.js
+│   └── User.js
+│
+├── node_modules/
+│
+├── routes/
+│   ├── AddressRoute.js
+│   ├── CardRoute.js
+│   ├── OrderRoute.js
+│   ├── ProductRoute.js
+│   ├── SellerRoute.js
+│   └── UserRoute.js
+│
+├── utils/
+│   └── whatsappUtils.js
+│
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── server.js
+└── README.md
