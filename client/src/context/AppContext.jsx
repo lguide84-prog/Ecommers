@@ -4,12 +4,12 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 // Configure axios defaults
-// Configure axios defaults
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-
-// Add this to ensure cookies are sent with every request
 axios.defaults.headers.common['Content-Type'] = 'application/json';
+
+// IMPORTANT: Add this line to ensure cookies are sent with every request
+axios.defaults.withCredentials = true;
 // Add request interceptor for logging
 axios.interceptors.request.use(
   (config) => {

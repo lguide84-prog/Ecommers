@@ -24,16 +24,18 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
       phone,
       role: 'user',
-      cartItems: {} // Initialize empty cart
+      cartItems: {}
     });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
+    // UPDATED: Cookie settings for production
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true in production, false in development
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: true, // Must be true for Vercel (HTTPS)
+      sameSite: 'none', // Must be 'none' for cross-site requests
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined // Optional: set domain for production
     });
 
     res.json({
@@ -68,11 +70,13 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
+    // UPDATED: Cookie settings for production
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: true, // Must be true for Vercel (HTTPS)
+      sameSite: 'none', // Must be 'none' for cross-site requests
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined // Optional: set domain for production
     });
 
     res.json({
@@ -136,8 +140,9 @@ export const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+      secure: true,
+      sameSite: 'none',
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
     });
     res.json({ success: true, message: "Logged out" });
   } catch (error) {

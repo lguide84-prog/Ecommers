@@ -3,8 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
-import userRouter from './routes/UserRoute.js'; // Changed from UserRouter to userRouter and UserRoute.js
-import sellerRouter from './routes/SellerRoute.js'; // Make sure this filename is correct
+import userRouter from './routes/UserRoute.js';
+import sellerRouter from './routes/SellerRoute.js';
 import connectCloudinary from './config/cloudconfig.js';
 import ProductRouter from './routes/ProductRoute.js';
 import cartRouter from './routes/CardRoute.js';
@@ -15,18 +15,18 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// ⭐ ADD THIS LINE
+// Trust proxy - important for Vercel deployment
 app.set('trust proxy', 1);
 
 // Database connect
 await connectDB();
 await connectCloudinary();
 
-// CORS Configuration - FIXED
+// CORS Configuration - UPDATED for production
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://ecommers-seven-omega.vercel.app'
+  'https://ecommers-seven-omega.vercel.app',
 ];
 
 app.use(cors({
@@ -51,9 +51,6 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Add this after cors middleware to handle preflight requests
-app.options('*', cors());
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -64,6 +61,8 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   console.log('Cookies:', req.cookies);
   console.log('Origin:', req.headers.origin);
+  console.log('Host:', req.headers.host);
+  console.log('Referer:', req.headers.referer);
   next();
 });
 
@@ -75,11 +74,12 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ 
     success: true, 
-    message: 'Server is running'
+    message: 'Server is running',
+    environment: process.env.NODE_ENV
   });
 });
 
-app.use('/api/user', userRouter); // Changed from UserRouter to userRouter
+app.use('/api/user', userRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/product', ProductRouter);
 app.use('/api/cart', cartRouter);
@@ -90,7 +90,6 @@ app.use('/api/order', orderRouter);
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   
-  // Handle CORS errors
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({
       success: false,
