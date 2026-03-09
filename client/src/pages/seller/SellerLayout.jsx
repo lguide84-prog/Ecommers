@@ -118,30 +118,10 @@ const SellerLayout = () => {
                       {seller?.name?.charAt(0) || "S"}
                     </span>
                   </div>
-                  <FiChevronDown 
-                    size={16} 
-                    className={`text-gray-400 transition-transform duration-300 ${
-                      showProfileMenu ? "rotate-180" : ""
-                    }`}
-                  />
+                  
                 </button>
 
-                {/* Profile Dropdown */}
-                {showProfileMenu && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-[#f0e9e2] py-2 animate-in fade-in slide-in-from-top-2">
-                    <div className="px-4 py-3 border-b border-[#f0e9e2]">
-                      <p className="text-sm font-medium text-gray-800">{seller?.name}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{seller?.email}</p>
-                    </div>
-                    <button
-                      onClick={logout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#faf9f8] transition-colors group"
-                    >
-                      <FiLogOut className="text-gray-400 group-hover:text-[#b76e79]" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
+                
               </div>
             </div>
           </div>
