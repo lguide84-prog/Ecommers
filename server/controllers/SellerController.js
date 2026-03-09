@@ -25,22 +25,14 @@ export const sellerLogin = async (req, res) => {
       role: 'seller',
     }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    // In sellerLogin function - REPLACE the res.cookie line with:
-res.cookie("sellerToken", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
-});
+    // FIXED: Uncommented and corrected cookie settings
+    res.cookie("sellerToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-// In sellerLogout function - REPLACE with:
-res.clearCookie("sellerToken", {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
-});
     return res.json({
       success: true,
       message: "Logged in successfully",
@@ -115,17 +107,18 @@ export const isSellerAuth = async (req, res) => {
 // ================== Seller Logout ==================
 export const sellerLogout = async (req, res) => {
   try {
+    // FIXED: Uncommented and corrected cookie clear settings
     res.clearCookie("sellerToken", {
       httpOnly: true,
-      secure: true,          // ✅
-      sameSite: "none",      // ✅
+      secure: true,
+      sameSite: "none",
       path: "/"
     });
 
     res.clearCookie("token", {
       httpOnly: true,
-      secure: true,          // ✅
-      sameSite: "none",      // ✅
+      secure: true,
+      sameSite: "none",
       path: "/"
     });
 

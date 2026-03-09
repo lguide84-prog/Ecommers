@@ -5,7 +5,7 @@ const authSeller = async (req, res, next) => {
   console.log("=== authSeller Middleware ===");
   console.log("Cookies:", req.cookies);
   
-  const { sellerToken } = req.cookies; // ✅ Look for sellerToken specifically
+  const { sellerToken } = req.cookies;
   console.log("sellerToken present:", !!sellerToken);
 
   if (!sellerToken) {
