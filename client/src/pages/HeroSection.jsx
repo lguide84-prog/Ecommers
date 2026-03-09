@@ -10,6 +10,7 @@ import laptopVideo3 from '/public/vl3.mp4';
 import mobileVideo1 from '/public/vi2.mp4';
 import mobileVideo2 from '/public/vi1.mp4';
 import mobileVideo3 from '/public/vi3.mp4';
+
 // Custom Icons
 const ChevronLeftIcon = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +76,7 @@ function HeroSection() {
 
   // Laptop/Desktop videos data
   const laptopVideos = [
-     {
+    {
       id: 1,
       src: laptopVideo3,
       alt: "Laptop Heritage Collection",
@@ -119,7 +120,7 @@ function HeroSection() {
       subtitle: "Modern Silhouettes",
       color: "from-rose-900/40"
     },
-     {
+    {
       id: 3,
       src: mobileVideo3,
       alt: "Mobile Contemporary Grace",
@@ -160,7 +161,6 @@ function HeroSection() {
 
   // Handle video end
   const handleVideoEnd = () => {
-    // Move to next slide when video ends (loop back to first)
     setCurrentSlide((prev) => (prev + 1) % currentVideos.length);
   };
 
@@ -225,8 +225,8 @@ function HeroSection() {
   };
 
   return (
-    <section className="relative w-full min-h-screen bg-stone-950 overflow-hidden">
-      {/* Full-screen Video Slider */}
+    <section className="relative w-full h-screen bg-stone-950 overflow-hidden">
+      {/* Full-screen Video Slider - No padding */}
       <div 
         className="absolute inset-0"
         onTouchStart={handleTouchStart}
@@ -279,16 +279,16 @@ function HeroSection() {
             {/* Gradient Overlay */}
             <div className={`absolute inset-0 bg-gradient-to-r ${video.color} via-transparent to-stone-950/90`} />
             
-       {/* Slide Content */}
-<div className="absolute inset-0 flex items-end pb-16 lg:pb-24">
-  <div className="container mx-auto px-6 lg:px-16">
-    <div className="max-w-2xl">
-      <div className={`transform transition-all duration-1000 delay-500 ${
-        index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
-      }`}>
-        
-        {/* Shop Now Button - Bottom aligned */}
-        <Link
+            {/* Slide Content */}
+            <div className="absolute inset-0 flex items-end pb-16 lg:pb-24">
+              <div className="w-full px-6 lg:px-16">
+                <div className="max-w-2xl">
+                  <div className={`transform transition-all duration-1000 delay-500 ${
+                    index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+                  }`}>
+                    
+                    {/* Shop Now Button - Bottom aligned */}
+                    <Link
                       to="/products"
                       className="inline-flex items-center gap-3 px-8 py-4 bg-white text-stone-900 text-sm uppercase tracking-[0.3em] hover:bg-stone-100 transition-all duration-700 group exo"
                     >
@@ -297,11 +297,10 @@ function HeroSection() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </Link>
-      </div>
-    </div>
-  </div>
-</div>
-
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Video Progress Indicator */}
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20">
@@ -393,8 +392,6 @@ function HeroSection() {
           {isAutoPlaying ? <PauseIcon /> : <PlayIcon />}
         </button>
       </div>
-
-    
 
       {/* Side Editorial Labels */}
       <div className="absolute left-8 top-1/2 -translate-y-1/2 hidden xl:block z-20">
