@@ -23,21 +23,28 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       phone,
-      role: 'user'
+      role: 'user',
+      cartItems: {} // Initialize empty cart
     });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,        // ✅
-  sameSite: "none",    // ✅
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // true in production, false in development
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     res.json({
       success: true,
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone }
+      user: { 
+        _id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        phone: user.phone,
+        cartItems: user.cartItems 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -61,33 +68,30 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-   // In registerUser, loginUser functions - REPLACE the res.cookie line with:
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
-});
-
-// In logout function - REPLACE with:
-res.clearCookie("token", {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
-});
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     res.json({
       success: true,
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role }
+      user: { 
+        _id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        phone: user.phone, 
+        role: user.role,
+        cartItems: user.cartItems 
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Get User Profile - This was missing in your exports
+// Get User Profile
 export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
@@ -100,7 +104,7 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-// Update User Profile - This was missing in your exports
+// Update User Profile
 export const updateUserProfile = async (req, res) => {
   try {
     const { name, phone } = req.body;
@@ -131,10 +135,10 @@ export const isAuth = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
-  httpOnly: true,
-  secure: true,        // ✅
-  sameSite: "none",
-});
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
     res.json({ success: true, message: "Logged out" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

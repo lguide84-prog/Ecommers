@@ -31,6 +31,7 @@ function Navbar() {
   const [open, setOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false)
+  const [desktopUserMenuOpen, setDesktopUserMenuOpen] = useState(false) // Add state for desktop menu
 
   const {
     user,
@@ -42,7 +43,7 @@ function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
+      setIsScrolled(window.scrollY > 50)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -55,11 +56,24 @@ function Navbar() {
     }
   }, [open])
 
+  // Close desktop menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (desktopUserMenuOpen && !e.target.closest('.desktop-user-menu')) {
+        setDesktopUserMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [desktopUserMenuOpen]);
+
   const handleLogout = async () => {
     try {
       await contextLogout()
       toast.success("Logged out successfully")
       setMobileUserMenuOpen(false)
+      setDesktopUserMenuOpen(false)
     } catch {
       toast.error("Error logging out")
     }
@@ -73,152 +87,192 @@ function Navbar() {
     { to: '/contact', label: 'Contact' },
   ]
 
-  return (
-    <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
-        ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-white py-3'}
-      `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+  // Text color based on scroll state
+  const textColor = isScrolled ? 'text-gray-800' : 'text-white'
+  const iconColor = isScrolled ? 'text-gray-600' : 'text-white/90'
+  const hoverBg = isScrolled ? 'hover:bg-gray-100' : 'hover:bg-white/20'
+  const borderColor = isScrolled ? 'border-gray-200' : 'border-white/20'
 
-            {/* DESKTOP LEFT */}
-            <div className="hidden md:flex items-center gap-45 lg:gap-60">
-              <NavLink to="/" className="h-20 w-20 lg:h-16 lg:w-16 flex-shrink-0">
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
+      ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'}
+    `}>
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+
+          {/* DESKTOP LEFT */}
+          <div className="hidden md:flex items-center gap-45 lg:gap-60">
+            <NavLink to="/" className="h-20 w-20 lg:h-16 lg:w-16 flex-shrink-0">
+              <img src={logo} alt="Brand Logo" className="w-full h-full object-contain" />
+            </NavLink>
+            <span className={`text-2xl lg:text-4xl xl:text-5xl font-semibold tracking-wide whitespace-nowrap transition-colors duration-300 ${isScrolled ? 'text-gray-800' : 'text-white'}`} style={{ fontFamily: "'Roboto Slab', serif" }}>
+              Creation Empire
+            </span>
+          </div>
+
+          {/* MOBILE HEADER */}
+          <div className="flex md:hidden items-center justify-between w-full">
+            <div className="flex items-center gap-8 max-w-[65%]">
+              <NavLink to="/" className="h-10 w-10 flex-shrink-0">
                 <img src={logo} alt="Brand Logo" className="w-full h-full object-contain" />
               </NavLink>
-              <span className="text-2xl lg:text-4xl xl:text-5xl font-semibold tracking-wide whitespace-nowrap" style={{ fontFamily: "'Roboto Slab', serif" }}>
+              <span className={`text-lg font-semibold truncate transition-colors duration-300 ${isScrolled ? 'text-gray-800' : 'text-white'}`} style={{ fontFamily: "'Roboto Slab', serif" }}>
                 Creation Empire
               </span>
             </div>
 
-            {/* MOBILE HEADER */}
-            <div className="flex md:hidden items-center justify-between w-full">
-              <div className="flex items-center gap-8 max-w-[65%]">
-                <NavLink to="/" className="h-10 w-10 flex-shrink-0">
-                  <img src={logo} alt="Brand Logo" className="w-full h-full object-contain" />
-                </NavLink>
-                <span className="text-lg font-semibold truncate" style={{ fontFamily: "'Roboto Slab', serif" }}>
-                  Creation Empire
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1">
-                {/* Cart */}
-                <button onClick={() => navigate("/cart")} className="relative p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition">
-                  <CartIcon />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center px-1">
-                      {cartCount}
-                    </span>
-                  )}
-                </button>
-
-                {/* User */}
-                {!user ? (
-                  <button onClick={() => setShowLogin(true)} className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition">
-                    <UserIcon />
-                  </button>
-                ) : (
-                  <div className="relative">
-                    <button onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)} className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition relative">
-                      <UserIcon />
-                      <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-white" />
-                    </button>
-
-                    {mobileUserMenuOpen && (
-                      <>
-                        <div className="fixed inset-0 z-40" onClick={() => setMobileUserMenuOpen(false)} />
-                        <div className="absolute right-0 top-10 w-56 bg-white rounded-xl shadow-xl border py-2 z-50">
-                          <div className="px-4 py-3 border-b">
-                            <p className="text-sm font-semibold truncate">{user.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                          </div>
-                          <button onClick={() => { setMobileUserMenuOpen(false); navigate('/myOrders'); }} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
-                            My Orders
-                          </button>
-                          <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                            Sign Out
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* Menu Button */}
-                <button onClick={() => setOpen(!open)} className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition z-50">
-                  <MenuIcon open={open} />
-                </button>
-              </div>
-            </div>
-
-            {/* DESKTOP RIGHT */}
-            <div className="hidden md:flex items-center gap-2 lg:gap-4">
-              <div className="flex items-center">
-                {navLinks.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) =>
-                      `relative px-4 py-2 text-md font-medium transition ${isActive ? 'text-black' : 'text-gray-600 hover:text-black'}`
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                ))}
-              </div>
-
+            <div className="flex items-center gap-1">
               {/* Cart */}
-              <button onClick={() => navigate("/cart")} className="relative p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition">
+              <button onClick={() => navigate("/cart")} className={`relative p-2 ${iconColor} ${hoverBg} rounded-full transition`}>
                 <CartIcon />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-black text-white text-xs rounded-full flex items-center justify-center px-1">
+                  <span className={`absolute -top-1 -right-1 min-w-[16px] h-4 ${isScrolled ? 'bg-black' : 'bg-white'} ${isScrolled ? 'text-white' : 'text-black'} text-[10px] rounded-full flex items-center justify-center px-1`}>
                     {cartCount}
                   </span>
                 )}
               </button>
 
-              {/* User Toggle */}
-              <button
-                onClick={user ? () => setMobileUserMenuOpen(!mobileUserMenuOpen) : () => setShowLogin(true)}
-                className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition"
-              >
-                <UserIcon />
+              {/* User - Mobile */}
+              {!user ? (
+                <button onClick={() => setShowLogin(true)} className={`p-2 ${iconColor} ${hoverBg} rounded-full transition`}>
+                  <UserIcon />
+                </button>
+              ) : (
+                <div className="relative">
+                  <button onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)} className={`p-2 ${iconColor} ${hoverBg} rounded-full transition relative`}>
+                    <UserIcon />
+                    <span className={`absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 ${isScrolled ? 'border-white' : 'border-transparent'}`} />
+                  </button>
+
+                  {mobileUserMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setMobileUserMenuOpen(false)} />
+                      <div className="absolute right-0 top-10 w-56 bg-white rounded-xl shadow-xl border py-2 z-50">
+                        <div className="px-4 py-3 border-b">
+                          <p className="text-sm font-semibold truncate text-gray-800">{user.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        </div>
+                        <button onClick={() => { setMobileUserMenuOpen(false); navigate('/myOrders'); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                          My Orders
+                        </button>
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                          Sign Out
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Menu Button */}
+              <button onClick={() => setOpen(!open)} className={`p-2 ${iconColor} ${hoverBg} rounded-full transition z-50`}>
+                <MenuIcon open={open} />
               </button>
             </div>
           </div>
-        </div>
 
-        {/* MOBILE SLIDE-OUT MENU */}
-        <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-          {/* Backdrop Overlay */}
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          
-          {/* Menu Panel */}
-          <div className={`absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl transition-transform duration-300 transform ${open ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
-            <div className="p-6 pt-20">
-              <div className="flex flex-col gap-2">
-                {navLinks.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      `text-xl font-medium py-3 px-4 rounded-lg transition-colors
-                      ${isActive ? 'bg-gray-100 text-black' : 'text-gray-600 hover:bg-gray-50'}`
-                    }
+          {/* DESKTOP RIGHT */}
+          <div className="hidden md:flex items-center gap-2 lg:gap-4">
+            <div className="flex items-center">
+              {navLinks.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `relative px-4 py-2 text-md font-medium transition ${isScrolled ? (isActive ? 'text-black' : 'text-gray-600 hover:text-black') : (isActive ? 'text-white' : 'text-white/80 hover:text-white')}`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            {/* Cart */}
+            <button onClick={() => navigate("/cart")} className={`relative p-2 ${iconColor} ${hoverBg} rounded-full transition`}>
+              <CartIcon />
+              {cartCount > 0 && (
+                <span className={`absolute -top-1 -right-1 min-w-[20px] h-5 ${isScrolled ? 'bg-black' : 'bg-white'} ${isScrolled ? 'text-white' : 'text-black'} text-xs rounded-full flex items-center justify-center px-1`}>
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {/* User - DESKTOP (FIXED) */}
+            <div className="relative desktop-user-menu">
+              {!user ? (
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className={`p-2 ${iconColor} ${hoverBg} rounded-full transition`}
+                >
+                  <UserIcon />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setDesktopUserMenuOpen(!desktopUserMenuOpen)}
+                    className={`p-2 ${iconColor} ${hoverBg} rounded-full transition relative`}
                   >
-                    {item.label}
-                  </NavLink>
-                ))}
-              </div>
+                    <UserIcon />
+                    <span className={`absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 ${isScrolled ? 'border-white' : 'border-transparent'}`} />
+                  </button>
+
+                  {desktopUserMenuOpen && (
+                    <div className="absolute right-0 top-10 w-56 bg-white rounded-xl shadow-xl border py-2 z-50">
+                      <div className="px-4 py-3 border-b">
+                        <p className="text-sm font-semibold truncate text-gray-800">{user.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <button 
+                        onClick={() => { 
+                          setDesktopUserMenuOpen(false); 
+                          navigate('/myOrders'); 
+                        }} 
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        My Orders
+                      </button>
+                      <button 
+                        onClick={handleLogout} 
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <div className="h-16" />
-    </>
+      {/* MOBILE SLIDE-OUT MENU */}
+      <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        {/* Backdrop Overlay */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
+        
+        {/* Menu Panel */}
+        <div className={`absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl transition-transform duration-300 transform ${open ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+          <div className="p-6 pt-20">
+            <div className="flex flex-col gap-2">
+              {navLinks.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `text-xl font-medium py-3 px-4 rounded-lg transition-colors
+                    ${isActive ? 'bg-gray-100 text-black' : 'text-gray-600 hover:bg-gray-50'}`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
   )
 }
 
