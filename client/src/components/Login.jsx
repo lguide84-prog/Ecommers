@@ -37,6 +37,8 @@ function Login() {
     
     if (state === "register" && !name) {
       errors.name = "Name is required";
+    } else if (state === "register" && name && name.length < 2) {
+      errors.name = "Name must be at least 2 characters";
     }
     
     setFormErrors(errors);
@@ -61,36 +63,90 @@ function Login() {
         payload = { email, password };
       }
 
+      console.log(`🚀 Making ${state} request to: /api/user/${state}`);
+      console.log('📦 Payload:', { ...payload, password: '***' });
+
+      // Make the login/register request
       const { data } = await axios.post(`/api/user/${state}`, payload);
+      
+      console.log('📥 Login/Register response:', data);
 
       if (data.success) {
-        // Immediately fetch user data again to get cart
-        const { data: userData } = await axios.get('/api/user/isauth');
-        if (userData.success) {
-          setUser(userData.user);
-          // Cart will be loaded automatically by the useEffect in AppContext
-        }
+        console.log('✅ Login/Register successful, fetching user data...');
         
-        navigate('/');
-        setShowLogin(false);
-        toast.success(
-          state === "login" 
-            ? "Welcome back! You've successfully logged in." 
-            : "Welcome to CREATION EMPIRE! Your account has been created.",
-          {
-            style: {
-              background: '#fb7185',
-              color: '#fff',
-              borderRadius: '4px',
-            },
-            icon: '👋',
-          }
-        );
+        // Immediately fetch user data again to get cart and verify auth
+        const { data: userData } = await axios.get('/api/user/isauth');
+        console.log('📥 User data response:', userData);
+        
+        if (userData.success) {
+          console.log('✅ User data fetched successfully:', userData.user);
+          setUser(userData.user);
+          
+          // Navigate to home
+          navigate('/');
+          
+          // Close login modal
+          setShowLogin(false);
+          
+          // Show success message
+          toast.success(
+            state === "login" 
+              ? "Welcome back! You've successfully logged in." 
+              : "Welcome to CREATION EMPIRE! Your account has been created.",
+            {
+              style: {
+                background: '#fb7185',
+                color: '#fff',
+                borderRadius: '4px',
+              },
+              icon: '👋',
+              duration: 3000,
+            }
+          );
+
+          // Reset form
+          setName("");
+          setEmail("");
+          setPassword("");
+          setFormErrors({});
+        } else {
+          console.error('❌ Failed to fetch user after login:', userData);
+          toast.error('Login successful but failed to load user data. Please try refreshing.');
+        }
       } else {
-        toast.error(data.message);
+        console.error('❌ Login/Register failed:', data.message);
+        toast.error(data.message || 'Authentication failed');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      console.error('❌ Login/Register error:', error);
+      
+      // Detailed error logging
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+        
+        // Handle specific error status codes
+        if (error.response.status === 401) {
+          toast.error('Invalid email or password');
+        } else if (error.response.status === 400) {
+          toast.error(error.response.data?.message || 'Invalid request');
+        } else if (error.response.status === 500) {
+          toast.error('Server error. Please try again later.');
+        } else {
+          toast.error(error.response.data?.message || 'Authentication failed');
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+        toast.error('Cannot connect to server. Please check your internet connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error setting up request:', error.message);
+        toast.error('An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +163,19 @@ function Login() {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  // Test server connection function (optional - can be removed)
+  const testServerConnection = async () => {
+    try {
+      console.log('Testing server connection...');
+      const { data } = await axios.get('/api/health');
+      console.log('Server health check:', data);
+      toast.success('Server connected successfully!');
+    } catch (error) {
+      console.error('Server connection failed:', error);
+      toast.error('Cannot connect to server. Please try again later.');
+    }
   };
 
   return (
@@ -221,7 +290,7 @@ function Login() {
                   <input
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
-                    placeholder={state === "login" ? "Enter your password" : "Create a password"}
+                    placeholder={state === "login" ? "Enter your password" : "Create a password (min. 6 characters)"}
                     className={`
                       w-full pl-10 pr-12 py-3 text-sm border bg-stone-50 
                       focus:bg-white transition-all duration-300 outline-none
@@ -244,6 +313,27 @@ function Login() {
                   <p className="text-xs text-rose-400 mt-1">{formErrors.password}</p>
                 )}
               </div>
+
+              {/* Remember Me - Only for Login */}
+              {state === "login" && (
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 border-stone-300 text-rose-400 focus:ring-rose-200 focus:ring-offset-0"
+                    />
+                    <span className="text-xs text-stone-500">Remember me</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="text-xs text-rose-400 hover:text-rose-500 hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
 
               {/* Submit Button */}
               <button
@@ -330,6 +420,19 @@ function Login() {
               <button className="text-stone-400 hover:text-rose-400 transition-colors">TERMS</button> AND{' '}
               <button className="text-stone-400 hover:text-rose-400 transition-colors">PRIVACY POLICY</button>
             </p>
+
+            {/* Debug Info - Remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 pt-4 border-t border-stone-200">
+                <button
+                  type="button"
+                  onClick={testServerConnection}
+                  className="text-xs text-stone-400 hover:text-rose-400"
+                >
+                  Test Server Connection
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
