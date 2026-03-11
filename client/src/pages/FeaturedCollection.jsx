@@ -242,10 +242,10 @@ function FeaturedCollection() {
                         {/* Price */}
                         <div className="flex items-center gap-2">
                           <span className="text-base font-medium text-stone-900">
-                            ${product.price.toFixed(2)}
+                            ₹{product.price.toFixed(2)}
                           </span>
                           <span className="text-sm text-stone-400 line-through">
-                            ${product.originalPrice.toFixed(2)}
+                            ₹{product.originalPrice.toFixed(2)}
                           </span>
                         </div>
                       </div>
