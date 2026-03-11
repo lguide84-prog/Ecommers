@@ -24,10 +24,10 @@ await connectCloudinary();
 
 // CORS Configuration - UPDATED for production
 const allowedOrigins = [
+  'https://www.creationempire.in',
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://ecommers-seven-omega.vercel.app',
-  'https://www.creationempire.in/'
+  'https://ecommers-seven-omega.vercel.app'
 ];
 
 app.use(cors({
